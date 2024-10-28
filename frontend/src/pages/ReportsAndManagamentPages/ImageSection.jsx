@@ -280,7 +280,7 @@ export const FileUploader = observer(({ store }) => {
         </h5>
         <p>
           <FormattedMessage id="SUPPORTED_FILETYPES" />
-          {`${" "}${maxSize} MB`}
+          {`${" "}${maxSize} MB.`}
         </p>
       </Row>
       <Row>
