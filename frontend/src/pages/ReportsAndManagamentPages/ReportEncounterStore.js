@@ -18,6 +18,8 @@ export class ReportEncounterStore {
   _finished;
   _signInModalShow;
   _exifDateTime;
+  _lat;
+  _lon;
 
   constructor() {
     this._imageSectionSubmissionId = null;
@@ -37,7 +39,7 @@ export class ReportEncounterStore {
       required: true,
     };
     this._placeSection = {
-      value: "",
+      locationId: null,
       error: false,
     };
     this._additionalCommentsSection = {
@@ -59,6 +61,8 @@ export class ReportEncounterStore {
     this._finished = false;
     this._signInModalShow = false;
     this._exifDateTime = []; 
+    this._lat = 0;
+    this._lon = 0;
     makeAutoObservable(this);
   }
 
@@ -123,6 +127,18 @@ export class ReportEncounterStore {
     return this._exifDateTime; 
   }
 
+  get lat() {
+    return this._lat;
+  }
+
+  get lon() {
+    return this._lon;
+  }
+
+  get locationId  () {
+    return this._placeSection.locationId;
+  }
+
   // Actions
   setImageSectionSubmissionId(value) {
     this._imageSectionSubmissionId = value;
@@ -175,8 +191,8 @@ export class ReportEncounterStore {
     this._speciesSection.error = error;
   }
 
-  setPlaceSection(value) {
-    this._placeSection.value = value;
+  setLocationId(value) {
+    this._placeSection.locationId = value;
   }
 
   setFollowUpSection(value) {
@@ -209,6 +225,14 @@ export class ReportEncounterStore {
 
   setSignInModalShow(value) {
     this._signInModalShow = value;
+  }
+
+  setLat(value) {
+    this._lat = value;
+  }
+
+  setLon(value) {
+    this._lon = value;
   }
 
   validateEmails() {
