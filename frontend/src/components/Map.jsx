@@ -4,7 +4,11 @@ import BrutalismButton from "./BrutalismButton";
 import ThemeContext from "../ThemeColorProvider";
 import { FormattedMessage } from "react-intl";
 
-const MapComponent = ({ center, zoom = 10, setBounds, setTempBounds }) => {
+const MapComponent = ({ 
+  center, 
+  zoom = 10, 
+  setBounds, 
+  setTempBounds=() => {} }) => {
   const theme = useContext(ThemeContext);
 
   const [rectangle, setRectangle] = useState(null);
@@ -75,7 +79,7 @@ const MapComponent = ({ center, zoom = 10, setBounds, setTempBounds }) => {
   };
 
   const [key, setKey] = useState(null);
-
+  
   useEffect(() => {
     if (window?.wildbookGlobals?.gMapKey) {
       setKey(window?.wildbookGlobals?.gMapKey);

@@ -306,9 +306,9 @@ export class ReportEncounterStore {
         assetFilenames: this._imageSectionFileNames,
         dateTime: this._dateTimeSection.value,
         taxonomy: this._speciesSection.value,
-        locationId: "Mpala.North",
+        locationId: this._placeSection.locationId,
         // followUp: this._followUpSection.value,
-        // images: this._imageSectionFileNames,
+        additionalComments: this._additionalCommentsSection.value,
       });
 
       if (response.status === 200) {

@@ -5,7 +5,10 @@ import { observer } from "mobx-react-lite";
 import GoogleMapReact from "google-map-react";
 import useGetSiteSettings from "../models/useGetSiteSettings";
 import { TreeSelect } from "antd";
-
+import MainButton from "./MainButton";
+import ThemeColorContext from "../ThemeColorProvider";
+import { LocationFilterByMap } from "../pages/ReportsAndManagamentPages/LocationFilterByMap";
+import "../pages/ReportsAndManagamentPages/reportEncounter.css"
 
 const MyPin = React.memo(() => {
   return <i
@@ -26,7 +29,9 @@ export const PlaceSection = observer(({ store }) => {
   const mapCenterLat = data?.mapCenterLat;
   const mapCenterLon = data?.mapCenterLon;
   const mapZoom = data?.mapZoom;
-  const locationData1 = data?.locationData.locationID;  
+  const [modalShow, setModalShow] = useState(false);
+
+  const theme = React.useContext(ThemeColorContext);
 
   const locationData =
     [
@@ -37,16 +42,14 @@ export const PlaceSection = observer(({ store }) => {
               {
                 "locationID": [],
                 "name": "Mpala.North",
-                "geospatiaInfo": {
-                  "lat": 51.5074,
-                  "lon": 7.1278
-                },
+                
                 "id": "Mpala.North"
               },
               {
                 "locationID": [],
                 "name": "Mpala.Central",
-                "id": "Mpala.Central"
+                "id": "Mpala.Central",
+
               },
               {
                 "locationID": [],
@@ -55,7 +58,11 @@ export const PlaceSection = observer(({ store }) => {
               }
             ],
             "name": "Mpala",
-            "id": "Mpala"
+            "id": "Mpala",
+            "geospatiaInfo": {
+                  "lat": 0,
+                  "lon": 40
+                },
           },
           {
             "locationID": [
@@ -71,12 +78,20 @@ export const PlaceSection = observer(({ store }) => {
               }
             ],
             "name": "Ol Pejeta",
+            "geospatiaInfo": {
+              "lat": 51.5074,
+              "lon": 7.1278
+            },
             "id": "Ol Pejeta"
           },
           {
             "locationID": [],
             "name": "Ol Jogi",
-            "id": "Ol Jogi"
+            "id": "Ol Jogi",
+            "geospatiaInfo": {
+              "lat": 51.5074,
+              "lon": 7.1278
+            },
           }
         ],
         "name": "Kenya",
@@ -131,57 +146,36 @@ export const PlaceSection = observer(({ store }) => {
           }
         ],
         "name": "South Africa",
-        "id": "South Africa"
+        "id": "South Africa",
+        "geospatiaInfo": {
+          "lat": 51.5074,
+          "lon": 7.1278
+        },
       }
     ];
 
-    const [ bounds, setBounds ] = useState({
-      north: 80,
-      south: -80,
-      east: 10,
-      west: -10
-    });
-  
   function convertToTreeData(locationData) {
-    
+
     return locationData.map((location) => ({
       title: location.name,
       value: location.id,
+      geospatiaInfo: location.geospatiaInfo,
       children: location.locationID?.length > 0
         ? convertToTreeData(location.locationID)
         : []
     }));
-  }
+  }  
 
   const [treeData, setTreeData] = useState([]);
-  const [treeData1, setTreeData1] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (locationData) {
       const data = convertToTreeData(locationData);
-      console.log("data +++++++++",data);
       setTreeData(data);
-      setTreeData1(data.filter(location => location.geospatiaInfo).filter((location) => {
-        console.log("location +++++++++",location);
-          return location.geospatiaInfo?.lat > bounds.south 
-          && location.geospatiaInfo?.lat < bounds.north 
-          && location.geospatiaInfo?.lon > bounds.west 
-          && location.geospatiaInfo?.lon < bounds.east;      
-        }))
-  console.log(treeData);
-  console.log("tree data +++++++++",treeData1);
+      
     }
-  }, [locationData]);
-
-  // const filterData = treeData.filter((location) => {
-
-  //   return location.geospatiaInfo.lat > bounds.south 
-  //   && location.geospatiaInfo.lat < bounds.north 
-  //   && location.geospatiaInfo.lon > bounds.west 
-  //   && location.geospatiaInfo.lon < bounds.east;
-
-  // });
-
+  }, [JSON.stringify(locationData)]);
 
   const handleMapClick = ({ lat, lng }) => {
     console.log("Map clicked", lat, lng);
@@ -191,8 +185,15 @@ export const PlaceSection = observer(({ store }) => {
 
   return (
     <div>
-      
-
+      <LocationFilterByMap
+        store={store}
+        modalShow={modalShow}
+        setModalShow={setModalShow}
+        treeData={treeData}
+        mapCenterLat={mapCenterLat}
+        mapCenterLon={mapCenterLon}
+        mapZoom={mapZoom}
+      />
       <Form.Group>
         <Form.Label>
           <FormattedMessage id="FILTER_LOCATION_ID" />
@@ -201,34 +202,86 @@ export const PlaceSection = observer(({ store }) => {
         <div className="position-relative d-inline-block w-100 mb-3">
           <TreeSelect
             treeData={treeData}
+            open={dropdownOpen}
+            onDropdownVisibleChange={(open) => setDropdownOpen(open)} 
             value={store.locationId}
-            onChange={(selectedValues) => {
-              const singleSelection = selectedValues.length > 0 ? selectedValues[selectedValues.length - 1] : null;
-              store.setLocationId(singleSelection);
-            }}
+            treeCheckStrictly
+            onChange={
+              (selectedValues) => {
+                console.log("selectedValues", selectedValues);
+                const singleSelection = selectedValues.length > 0 ? selectedValues[selectedValues.length - 1] : null;
+                store.setLocationId(singleSelection?.value || null);
+              }
+            }
             treeDefaultExpandAll
             showSearch
             style={{ width: "100%" }}
-            placeholder={<FormattedMessage id="SELECT_LOCATION" />}
+            placeholder={<FormattedMessage id="LOCATIONID_INSTRUCTION" />}
             allowClear
             treeCheckable={true}
             size="large"
             treeLine
             dropdownRender={(menu) => (
-              <div style={{ 
-                maxHeight: "400px", 
-                overflowY: "auto",
-                backgroundColor: "green",
+              <div style={{
+                maxHeight: "400px",
+                // overflowY: "auto",
+              }}>
+                <div style={{
+                  overflowY: "auto",
+                  padding: "10px",
+                  flexGrow: 1
                 }}>
-                {menu}
+                  {menu}
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center"
+                  style={{
+                    position: "sticky",
+                    bottom: 0,
+                    paddingLeft: "10px",
+                    width: "100%",
+                    height: "50px",
+                  }}
+                >
+                  <a
+                    style={{
+                      color: "blue",
+                    }}
+                    onClick={() => {
+                      setModalShow(true);
+                    }}>Filter By Map</a>
+                  <div className="d-flex flex-row">
+                    <MainButton
+                      noArrow={true}
+                      backgroundColor={theme.primaryColors.primary500}
+                      color="white"
+                      className="btn btn-primary"
+                      onClick={() => {
+                        setDropdownOpen(false);
+                      }}
+                    > <FormattedMessage id="DONE" /></MainButton>
+                    <MainButton
+                      noArrow={true}
+                      backgroundColor={"white"}
+                      color={theme.primaryColors.primary500}
+                      className="btn btn-primary"
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        store.setLocationId(null);
+                      }}
+                    > <FormattedMessage id="CANCEL" /></MainButton>
+                  </div>
+
+                </div>
               </div>
             )}
-            dropdownStyle={{ 
+            dropdownStyle={{
+              maxHeight: "500px",
               backgroundColor: "white",
               padding: 0,
               paddingBottom: "20px",
-              maxHeight: 400, 
-              overflow: "auto" }}
+              overflow: "auto"
+            }}
           />
 
         </div>
