@@ -4,7 +4,7 @@ import { FormattedMessage } from "react-intl";
 import { observer } from "mobx-react-lite";
 import GoogleMapReact from "google-map-react";
 import useGetSiteSettings from "../models/useGetSiteSettings";
-import { TreeSelect } from "antd";
+import { TreeSelect, Tag } from "antd";
 import MainButton from "./MainButton";
 import ThemeColorContext from "../ThemeColorProvider";
 import { LocationFilterByMap } from "../pages/ReportsAndManagamentPages/LocationFilterByMap";
@@ -23,6 +23,24 @@ const MyPin = React.memo(() => {
   ></i>
 
 });
+
+const customTagRender = (props) => {
+  const { label } = props;
+
+  return (
+    <Tag
+      style={{
+        borderRadius: '8px',
+        backgroundColor: 'white',
+        border: "none",
+        color: 'black',
+        fontSize: '1rem',
+      }}
+    >
+      {label}
+    </Tag>
+  );
+};
 
 export const PlaceSection = observer(({ store }) => {
   const { data } = useGetSiteSettings();
@@ -203,6 +221,7 @@ export const PlaceSection = observer(({ store }) => {
           <TreeSelect
             treeData={treeData}
             open={dropdownOpen}
+            tagRender={customTagRender}
             onDropdownVisibleChange={(open) => setDropdownOpen(open)} 
             value={store.locationId}
             treeCheckStrictly

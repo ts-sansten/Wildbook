@@ -429,6 +429,8 @@ export const ReportEncounter = observer(() => {
               backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url(${process.env.PUBLIC_URL}/images/report_an_encounter.png)`,
               backgroundSize: "cover",
               backgroundPosition: "center",
+              backdropFilter: "blur(13px)",
+              WebkitBackdropFilter: "blur(2px)",
               borderRadius: "25px",
               height: "470px",
               maxWidth: "350px",
