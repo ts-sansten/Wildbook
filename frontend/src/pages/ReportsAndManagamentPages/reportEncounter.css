@@ -1,11 +1,13 @@
 .ant-select-tree {
-    background-color: yellow;
+    /* background-color: yellow; */
 }
 
 .ant-select-tree-list-holder-inner {
+    /* background-color: aqua; */
     padding-bottom: 10px;
     height: 1000px;
     z-index: 9999;
+    height: 1300px;
 }
 
 .modal-90w {

@@ -41,6 +41,7 @@ export class ReportEncounterStore {
     this._placeSection = {
       locationId: null,
       error: false,
+      required: true,
     };
     this._additionalCommentsSection = {
       value: "",
@@ -135,10 +136,6 @@ export class ReportEncounterStore {
     return this._lon;
   }
 
-  get locationId  () {
-    return this._placeSection.locationId;
-  }
-
   // Actions
   setImageSectionSubmissionId(value) {
     this._imageSectionSubmissionId = value;
@@ -193,6 +190,10 @@ export class ReportEncounterStore {
 
   setLocationId(value) {
     this._placeSection.locationId = value;
+  }
+
+  setLocationError(error) {
+    this._placeSection.error = error;
   }
 
   setFollowUpSection(value) {
@@ -282,15 +283,11 @@ export class ReportEncounterStore {
     if(!this._dateTimeSection.value && this._dateTimeSection.required) {
       this._dateTimeSection.error = true;
       isValid = false;
-    } 
+    }}
 
-      // Uncomment the place section validation if needed
-      // if (!this._placeSection.value) {
-      //   this._placeSection.error = true;
-      //   isValid = false;
-      // } else {
-      //   this._placeSection.error = false;
-      // }
+    if(!this._placeSection.locationId && this._placeSection.required) {
+      this._placeSection.error = true;
+      isValid = false;
     }
     console.log("Validation result", isValid);
     return isValid;

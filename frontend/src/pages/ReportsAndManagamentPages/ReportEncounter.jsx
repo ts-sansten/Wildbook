@@ -6,7 +6,7 @@ import AuthContext from "../../AuthProvider";
 import { FormattedMessage } from "react-intl";
 import ImageSection from "./ImageSection";
 import { DateTimeSection } from "./DateTimeSection";
-import PlaceSection from "../../components/PlaceSection";
+import PlaceSection from "./PlaceSection";
 import { AdditionalCommentsSection } from "../../components/AdditionalCommentsSection";
 import { FollowUpSection } from "../../components/FollowUpSection";
 import { observer, useLocalObservable } from "mobx-react-lite";

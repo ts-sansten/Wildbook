@@ -3,12 +3,13 @@ import { Form } from "react-bootstrap";
 import { FormattedMessage } from "react-intl";
 import { observer } from "mobx-react-lite";
 import GoogleMapReact from "google-map-react";
-import useGetSiteSettings from "../models/useGetSiteSettings";
+import useGetSiteSettings from "../../models/useGetSiteSettings";
 import { TreeSelect, Tag } from "antd";
-import MainButton from "./MainButton";
-import ThemeColorContext from "../ThemeColorProvider";
-import { LocationFilterByMap } from "../pages/ReportsAndManagamentPages/LocationFilterByMap";
-import "../pages/ReportsAndManagamentPages/reportEncounter.css"
+import MainButton from "../../components/MainButton";
+import ThemeColorContext from "../../ThemeColorProvider";
+import { LocationFilterByMap } from "./LocationFilterByMap";
+import "./reportEncounter.css"
+import { Alert } from "react-bootstrap";
 
 const MyPin = React.memo(() => {
   return <i
@@ -26,7 +27,6 @@ const MyPin = React.memo(() => {
 
 const customTagRender = (props) => {
   const { label } = props;
-
   return (
     <Tag
       style={{
@@ -42,14 +42,27 @@ const customTagRender = (props) => {
   );
 };
 
+function convertToTreeData(locationData) {
+
+  return locationData.map((location) => ({
+    title: location.name,
+    value: location.id,
+    geospatiaInfo: location.geospatiaInfo,
+    children: location.locationID?.length > 0
+      ? convertToTreeData(location.locationID)
+      : []
+  }));
+}
+
 export const PlaceSection = observer(({ store }) => {
   const { data } = useGetSiteSettings();
   const mapCenterLat = data?.mapCenterLat;
   const mapCenterLon = data?.mapCenterLon;
   const mapZoom = data?.mapZoom;
   const [modalShow, setModalShow] = useState(false);
-
   const theme = React.useContext(ThemeColorContext);
+
+  console.log("++++++++++++++++++", JSON.stringify(store.placeSection));
 
   const locationData =
     [
@@ -60,7 +73,6 @@ export const PlaceSection = observer(({ store }) => {
               {
                 "locationID": [],
                 "name": "Mpala.North",
-                
                 "id": "Mpala.North"
               },
               {
@@ -78,9 +90,9 @@ export const PlaceSection = observer(({ store }) => {
             "name": "Mpala",
             "id": "Mpala",
             "geospatiaInfo": {
-                  "lat": 0,
-                  "lon": 40
-                },
+              "lat": 0,
+              "lon": 40
+            },
           },
           {
             "locationID": [
@@ -172,18 +184,6 @@ export const PlaceSection = observer(({ store }) => {
       }
     ];
 
-  function convertToTreeData(locationData) {
-
-    return locationData.map((location) => ({
-      title: location.name,
-      value: location.id,
-      geospatiaInfo: location.geospatiaInfo,
-      children: location.locationID?.length > 0
-        ? convertToTreeData(location.locationID)
-        : []
-    }));
-  }  
-
   const [treeData, setTreeData] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -191,7 +191,6 @@ export const PlaceSection = observer(({ store }) => {
     if (locationData) {
       const data = convertToTreeData(locationData);
       setTreeData(data);
-      
     }
   }, [JSON.stringify(locationData)]);
 
@@ -213,17 +212,24 @@ export const PlaceSection = observer(({ store }) => {
         mapZoom={mapZoom}
       />
       <Form.Group>
+        <h5>
+          <FormattedMessage id="PLACE_SECTION" />
+          {store.placeSection.required && <span>*</span>}
+        </h5>
+        <p className="fs-6">
+          <FormattedMessage id="LOCATION_ID_REQUIRED_WARNING" />
+        </p>
         <Form.Label>
-          <FormattedMessage id="FILTER_LOCATION_ID" />
-          {store.speciesSection.required && <span>*</span>}
+          <FormattedMessage id="LOCATION_ID" />
+          {store.placeSection.required && <span>*</span>}
         </Form.Label>
         <div className="position-relative d-inline-block w-100 mb-3">
           <TreeSelect
             treeData={treeData}
             open={dropdownOpen}
             tagRender={customTagRender}
-            onDropdownVisibleChange={(open) => setDropdownOpen(open)} 
-            value={store.locationId}
+            onDropdownVisibleChange={(open) => setDropdownOpen(open)}
+            value={store.placeSection.locationId}
             treeCheckStrictly
             onChange={
               (selectedValues) => {
@@ -243,7 +249,6 @@ export const PlaceSection = observer(({ store }) => {
             dropdownRender={(menu) => (
               <div style={{
                 maxHeight: "400px",
-                // overflowY: "auto",
               }}>
                 <div style={{
                   overflowY: "auto",
@@ -268,7 +273,7 @@ export const PlaceSection = observer(({ store }) => {
                     }}
                     onClick={() => {
                       setModalShow(true);
-                    }}>Filter By Map</a>
+                    }}><FormattedMessage id="FILTER_BY_MAP" /></a>
                   <div className="d-flex flex-row">
                     <MainButton
                       noArrow={true}
@@ -303,6 +308,24 @@ export const PlaceSection = observer(({ store }) => {
             }}
           />
 
+          {store.placeSection.error && (
+            <Alert
+              variant="danger"
+              style={{
+                marginTop: "10px",
+              }}
+            >
+              <i
+                className="bi bi-info-circle-fill"
+                style={{ 
+                  marginRight: "8px", 
+                  color: theme.statusColors.red600
+                }}
+              ></i>
+              <FormattedMessage id="EMPTY_REQUIRED_WARNING" />
+            </Alert>
+          )}
+
         </div>
         <Form.Label>
           <FormattedMessage id="FILTER_GPS_COORDINATES" />
@@ -313,6 +336,7 @@ export const PlaceSection = observer(({ store }) => {
             <Form.Control
               type="text"
               required
+              placeholder="##.##"
               value={store.lat || ""}
               onChange={(e) => store.setLat(parseFloat(e.target.value || 0))}
             />
@@ -321,6 +345,7 @@ export const PlaceSection = observer(({ store }) => {
             <Form.Control
               type="text"
               required
+              placeholder="##.##"
               value={store.lon || ""}
               onChange={(e) => store.setLon(parseFloat(e.target.value || 0))}
             />
