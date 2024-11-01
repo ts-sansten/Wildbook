@@ -10,6 +10,110 @@ import ThemeColorContext from "../../ThemeColorProvider";
 import { LocationFilterByMap } from "./LocationFilterByMap";
 import "./reportEncounter.css"
 import { Alert } from "react-bootstrap";
+import locationData from "./reef_locale.json";
+
+const locationData1 = [
+  {
+    "locationID": [
+      {
+        "locationID": [
+          {
+            "locationID": [],
+            "name": "Mpala.North",
+            "id": "Mpala.North"
+          },
+          {
+            "locationID": [],
+            "name": "Mpala.Central",
+            "id": "Mpala.Central"
+          },
+          {
+            "locationID": [],
+            "name": "Mpala.South",
+            "id": "Mpala.South"
+          }
+        ],
+        "name": "Mpala",
+        "id": "Mpala"
+      },
+      {
+        "locationID": [
+          {
+            "locationID": [],
+            "name": "Ol Pejeta.East",
+            "id": "Ol Pejeta.East"
+          },
+          {
+            "locationID": [],
+            "name": "Ol Pejeta.West",
+            "id": "Ol Pejeta.West"
+          }
+        ],
+        "name": "Ol Pejeta",
+        "id": "Ol Pejeta"
+      },
+      {
+        "locationID": [],
+        "name": "Ol Jogi",
+        "id": "Ol Jogi"
+      }
+    ],
+    "name": "Kenya",
+    "id": "Kenya"
+  },
+  {
+    "locationID": [
+      {
+        "locationID": [],
+        "name": "Elandsberg Nature Reserve",
+        "id": "Elandsberg Nature Reserve"
+      },
+      {
+        "locationID": [],
+        "name": "Kosierskraal",
+        "id": "Kosierskraal"
+      },
+      {
+        "locationID": [],
+        "name": "KwaZulu-Natal",
+        "id": "KwaZulu-Natal"
+      },
+      {
+        "locationID": [],
+        "name": "Nelson Mandela University Nature Reserve",
+        "id": "Nelson Mandela University Nature Reserve"
+      },
+      {
+        "locationID": [],
+        "name": "Nuwejaars Wetland SMA",
+        "id": "Nuwejaars Wetland SMA"
+      },
+      {
+        "locationID": [],
+        "name": "Pilanesberg National Park",
+        "id": "Pilanesberg National Park"
+      },
+      {
+        "locationID": [],
+        "name": "Pampoenvlei",
+        "id": "Pampoenvlei"
+      },
+      {
+        "locationID": [],
+        "name": "Groote Post",
+        "id": "Groote Post"
+      },
+      {
+        "locationID": [],
+        "name": "Vlakkenhuiwel",
+        "id": "Vlakkenhuiwel"
+      }
+    ],
+    "name": "South Africa",
+    "id": "South Africa"
+  }
+];
+
 
 const MyPin = React.memo(() => {
   return <i
@@ -22,7 +126,6 @@ const MyPin = React.memo(() => {
       left: "-10px",
     }}
   ></i>
-
 });
 
 const customTagRender = (props) => {
@@ -43,7 +146,6 @@ const customTagRender = (props) => {
 };
 
 function convertToTreeData(locationData) {
-
   return locationData.map((location) => ({
     title: location.name,
     value: location.id,
@@ -61,128 +163,6 @@ export const PlaceSection = observer(({ store }) => {
   const mapZoom = data?.mapZoom;
   const [modalShow, setModalShow] = useState(false);
   const theme = React.useContext(ThemeColorContext);
-
-  console.log("++++++++++++++++++", JSON.stringify(store.placeSection));
-
-  const locationData =
-    [
-      {
-        "locationID": [
-          {
-            "locationID": [
-              {
-                "locationID": [],
-                "name": "Mpala.North",
-                "id": "Mpala.North"
-              },
-              {
-                "locationID": [],
-                "name": "Mpala.Central",
-                "id": "Mpala.Central",
-
-              },
-              {
-                "locationID": [],
-                "name": "Mpala.South",
-                "id": "Mpala.South"
-              }
-            ],
-            "name": "Mpala",
-            "id": "Mpala",
-            "geospatiaInfo": {
-              "lat": 0,
-              "lon": 40
-            },
-          },
-          {
-            "locationID": [
-              {
-                "locationID": [],
-                "name": "Ol Pejeta.East",
-                "id": "Ol Pejeta.East"
-              },
-              {
-                "locationID": [],
-                "name": "Ol Pejeta.West",
-                "id": "Ol Pejeta.West"
-              }
-            ],
-            "name": "Ol Pejeta",
-            "geospatiaInfo": {
-              "lat": 51.5074,
-              "lon": 7.1278
-            },
-            "id": "Ol Pejeta"
-          },
-          {
-            "locationID": [],
-            "name": "Ol Jogi",
-            "id": "Ol Jogi",
-            "geospatiaInfo": {
-              "lat": 51.5074,
-              "lon": 7.1278
-            },
-          }
-        ],
-        "name": "Kenya",
-        "id": "Kenya"
-      },
-      {
-        "locationID": [
-          {
-            "locationID": [],
-            "name": "Elandsberg Nature Reserve",
-            "id": "Elandsberg Nature Reserve"
-          },
-          {
-            "locationID": [],
-            "name": "Kosierskraal",
-            "id": "Kosierskraal"
-          },
-          {
-            "locationID": [],
-            "name": "KwaZulu-Natal",
-            "id": "KwaZulu-Natal"
-          },
-          {
-            "locationID": [],
-            "name": "Nelson Mandela University Nature Reserve",
-            "id": "Nelson Mandela University Nature Reserve"
-          },
-          {
-            "locationID": [],
-            "name": "Nuwejaars Wetland SMA",
-            "id": "Nuwejaars Wetland SMA"
-          },
-          {
-            "locationID": [],
-            "name": "Pilanesberg National Park",
-            "id": "Pilanesberg National Park"
-          },
-          {
-            "locationID": [],
-            "name": "Pampoenvlei",
-            "id": "Pampoenvlei"
-          },
-          {
-            "locationID": [],
-            "name": "Groote Post",
-            "id": "Groote Post"
-          },
-          {
-            "locationID": [],
-            "name": "Vlakkenhuiwel",
-            "id": "Vlakkenhuiwel"
-          }
-        ],
-        "name": "South Africa",
-        "id": "South Africa",
-        "geospatiaInfo": {
-          "lat": 51.5074,
-          "lon": 7.1278
-        },
-      }
-    ];
 
   const [treeData, setTreeData] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -233,7 +213,6 @@ export const PlaceSection = observer(({ store }) => {
             treeCheckStrictly
             onChange={
               (selectedValues) => {
-                console.log("selectedValues", selectedValues);
                 const singleSelection = selectedValues.length > 0 ? selectedValues[selectedValues.length - 1] : null;
                 store.setLocationId(singleSelection?.value || null);
               }
@@ -257,7 +236,6 @@ export const PlaceSection = observer(({ store }) => {
                 }}>
                   {menu}
                 </div>
-
                 <div className="d-flex justify-content-between align-items-center"
                   style={{
                     position: "sticky",
@@ -307,7 +285,6 @@ export const PlaceSection = observer(({ store }) => {
               overflow: "auto"
             }}
           />
-
           {store.placeSection.error && (
             <Alert
               variant="danger"
@@ -329,7 +306,6 @@ export const PlaceSection = observer(({ store }) => {
         </div>
         <Form.Label>
           <FormattedMessage id="FILTER_GPS_COORDINATES" />
-          {store.speciesSection.required && <span>*</span>}
         </Form.Label>
         <div className="d-flex flex-row gap-3">
           <div className="w-50">
@@ -378,10 +354,8 @@ export const PlaceSection = observer(({ store }) => {
               {store.lat && store.lon &&
                 <MyPin lat={parseFloat(store.lat)} lng={parseFloat(store.lon)} />
               }
-
             </GoogleMapReact>)
         }
-
       </div>
     </div>
   );

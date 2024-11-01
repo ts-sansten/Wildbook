@@ -1,33 +1,44 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import GoogleMapReact from 'google-map-react';
 import MainButton from '../../components/MainButton';
 import ThemeColorContext from '../../ThemeColorProvider';
 import { observer } from "mobx-react-lite";
 import "./reportEncounter.css";
-import { TreeSelect } from 'antd';
+import { TreeSelect, Tag } from 'antd';
 import Map from '../../components/Map';
-import { debounce } from 'lodash';
 
+const customTagRender = (props) => {
+  const { label } = props;
+  return (
+    <Tag
+      style={{
+        borderRadius: '8px',
+        backgroundColor: 'white',
+        border: "none",
+        color: 'black',
+        fontSize: '1rem',
+      }}
+    >
+      {label}
+    </Tag>
+  );
+};
 
 const filterLocationsInBounds = (treeData, bounds) => {
-  console.log("bounds", bounds);
-
-  const { north, south, east, west } = bounds;
-
-  const isWithinBounds = (geospatiaInfo) => {
-    if (!geospatiaInfo) return false;
-    const { lat, lon } = geospatiaInfo;
-    return lat <= north && lat >= south && lon <= east && lon >= west;
-  };
-
+  if (bounds) {
+    const { north, south, east, west } = bounds;
+    const isWithinBounds = (geospatiaInfo) => {
+      if (!geospatiaInfo) return false;
+      const { lat, lon } = geospatiaInfo;
+      return lat <= north && lat >= south && lon <= east && lon >= west;
+    };
+  
   const filterTree = (nodes) => {
     return nodes
       .map((node) => {
         const filteredChildren = filterTree(node.children || []);
         const nodeInBounds = isWithinBounds(node.geospatiaInfo) || filteredChildren.length > 0;
-
         if (nodeInBounds) {
           return {
             ...node,
@@ -40,8 +51,10 @@ const filterLocationsInBounds = (treeData, bounds) => {
   };
 
   return filterTree(treeData);
-};
+}
 
+return;
+};
 
 export const LocationFilterByMap = observer(({
   store,
@@ -59,11 +72,21 @@ export const LocationFilterByMap = observer(({
   const [isMouseUp, setIsMouseUp] = useState(false);
 
   const [bounds, setBounds] = useState({
-    north: 55,
-    south: 45,
-    east: 10,
-    west: 1
+    north: 90,
+    south: -90,
+    east: 180,
+    west: -180
   });
+
+  console.log("s", bounds);
+  // useEffect(() => {
+  //   if (!bounds) setBounds({
+  //     north: 90,
+  //     south: -90,
+  //     east: 180,
+  //     west: -180
+  //   });
+  // }, [bounds]);
 
   useEffect(() => {
     const handleMouseUp = () => {
@@ -77,12 +100,15 @@ export const LocationFilterByMap = observer(({
   }, []);
 
   useEffect(() => {
+    console.log(isMouseUp);
     if (isMouseUp && bounds) {
-      console.log("filterLocationsInBounds(treeData, bounds)", filterLocationsInBounds(treeData, bounds));
+      console.log("bounds", bounds);
       setMapTreeData(filterLocationsInBounds(treeData, bounds));
     }
+
+    // console.log(setMapTreeData(filterLocationsInBounds(treeData, bounds)));
   }, [JSON.stringify(treeData), bounds, isMouseUp]);
-  
+
   return <Modal
     dialogClassName="modal-90w"
     show={modalShow}
@@ -116,17 +142,6 @@ export const LocationFilterByMap = observer(({
             center={{ lat: -1.286389, lng: 36.817223 }}
             zoom={mapZoom || 4}
           />
-          // <GoogleMapReact
-          //   bootstrapURLKeys={{ key: "AIzaSyBp0XgdcCh6jF9B2OJtsL1JtYvT5zdrllk" }}
-          //   center={{
-          //     lat: mapCenterLat,
-          //     lng: mapCenterLon,
-          //   }}
-          //   defaultZoom={mapZoom || 4}
-          //   // onClick={handleMapClick}
-          //   yesIWantToUseGoogleMapApiInternals
-          // >
-          // </GoogleMapReact>
         }
 
       </div>
@@ -144,12 +159,12 @@ export const LocationFilterByMap = observer(({
           </p>
           <TreeSelect
             key={"treeselecttwo"}
-            treeData={mapTreeData}
-            value={store.locationId}
+            treeData={treeData}
+            value={store.placeSection.locationId}
+            tagRender={customTagRender}
             treeCheckStrictly
             onChange={
               (selectedValues) => {
-                console.log("selectedValues", selectedValues);
                 const singleSelection = selectedValues.length > 0 ? selectedValues[selectedValues.length - 1] : null;
                 store.setLocationId(singleSelection?.value || null);
               }
@@ -162,7 +177,6 @@ export const LocationFilterByMap = observer(({
             treeCheckable={true}
             size="large"
             treeLine
-
             dropdownStyle={{
               maxHeight: "500px",
               backgroundColor: "white",
@@ -188,7 +202,10 @@ export const LocationFilterByMap = observer(({
             backgroundColor="white"
             color={theme.primaryColors.primary500}
             className="btn btn-primary"
-            onClick={() => setModalShow(false)}
+            onClick={() => {
+              store.setLocationId(null);
+              setModalShow(false)
+            }}
           > <FormattedMessage id="CANCEL" />
           </MainButton>
         </div>
